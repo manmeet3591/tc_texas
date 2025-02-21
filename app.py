@@ -10,9 +10,9 @@ def load_data():
 
 data = load_data()
 
-# # Convert data types to avoid errors
-# data["Year"] = pd.to_numeric(data["Year"], errors='coerce')
-# data["TC"] = pd.to_numeric(data["TC"], errors='coerce')
+# Convert data types to avoid errors
+data["Year"] = pd.to_numeric(data["Year"], errors='coerce')
+data["TC"] = pd.to_numeric(data["TC"], errors='coerce')
 
 # data.dropna(inplace=True)  # Remove invalid entries
 
