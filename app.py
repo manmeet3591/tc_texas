@@ -68,11 +68,28 @@ if ds:
         #     texas_counties.at[index, "TC_Mask_Sum"] = np.sum(np.array(data["TC_Mask"])[mask])
         for index, county in texas_counties.iterrows():
             minx, miny, maxx, maxy = county.geometry.bounds  # Extract bounds properly
+        
+            # Create a Boolean mask
             mask = (
                 (data["Longitude"] >= minx) & (data["Longitude"] <= maxx) &
                 (data["Latitude"] >= miny) & (data["Latitude"] <= maxy)
-                    )
-            texas_counties.at[index, "TC_Mask_Sum"] = np.sum(np.array(data["TC_Mask"])[mask])
+            )
+        
+            # Ensure that the mask is not empty before applying it
+            masked_values = np.array(data["TC_Mask"])[mask]
+        
+            if masked_values.size > 0:  # Avoid indexing empty array
+                texas_counties.at[index, "TC_Mask_Sum"] = np.sum(masked_values)
+            else:
+                texas_counties.at[index, "TC_Mask_Sum"] = 0  # Assign zero if no data found
+
+        # for index, county in texas_counties.iterrows():
+        #     minx, miny, maxx, maxy = county.geometry.bounds  # Extract bounds properly
+        #     mask = (
+        #         (data["Longitude"] >= minx) & (data["Longitude"] <= maxx) &
+        #         (data["Latitude"] >= miny) & (data["Latitude"] <= maxy)
+        #             )
+        #     texas_counties.at[index, "TC_Mask_Sum"] = np.sum(np.array(data["TC_Mask"])[mask])
 
         # Create a map
         m = folium.Map(location=[31, -99], zoom_start=5)
