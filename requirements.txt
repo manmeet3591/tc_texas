@@ -1,0 +1,6 @@
+streamlit
+xarray
+geopandas
+folium
+numpy
+branca
