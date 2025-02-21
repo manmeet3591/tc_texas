@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 # Load the dataset
 @st.cache_data
@@ -14,6 +15,9 @@ data["Year"] = pd.to_numeric(data["Year"], errors='coerce')
 data["TC"] = pd.to_numeric(data["TC"], errors='coerce')
 
 data.dropna(inplace=True)  # Remove invalid entries
+
+# Ensure Scenario column is string to avoid boolean-related errors
+data["Scenario"] = data["Scenario"].astype(str)
 
 # Streamlit App Layout
 st.title("Texas Tropical Cyclones Data Viewer")
