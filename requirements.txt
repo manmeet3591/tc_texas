@@ -1,5 +1,5 @@
 streamlit
-xarray
+xarray[complete]
 geopandas
 folium
 numpy
