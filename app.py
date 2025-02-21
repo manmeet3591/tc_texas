@@ -21,7 +21,7 @@ data["Scenario"] = data["Scenario"].astype(str)
 data["County"] = data["County"].astype(str)
 
 # Streamlit App Layout
-st.title("Texas Tropical Cyclones Data Viewer")
+st.title("Texas Tropical Cyclones Past and Future Scenarios")
 
 # Sidebar Filters
 years = sorted(data["Year"].unique())
