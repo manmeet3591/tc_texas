@@ -9,12 +9,18 @@ def load_data():
 
 data = load_data()
 
+# Convert data types to avoid errors
+data["Year"] = pd.to_numeric(data["Year"], errors='coerce')
+data["TC"] = pd.to_numeric(data["TC"], errors='coerce')
+
+data.dropna(inplace=True)  # Remove invalid entries
+
 # Streamlit App Layout
 st.title("Texas Tropical Cyclones Data Viewer")
 
 # Sidebar Filters
 years = sorted(data["Year"].unique())
-scenarios = ["ssp245", "ssp585", "historical"]
+scenarios = sorted(data["Scenario"].unique())
 
 selected_year = st.sidebar.selectbox("Select Year", years)
 selected_scenario = st.sidebar.selectbox("Select Scenario", scenarios)
