@@ -22,12 +22,12 @@ data["Scenario"] = data["Scenario"].astype(str)
 # Streamlit App Layout
 st.title("Texas Tropical Cyclones in the past and future scenarios")
 
-# # Sidebar Filters
-# years = sorted(data["Year"].unique())
-# scenarios = sorted(data["Scenario"].unique())
+# Sidebar Filters
+years = sorted(data["Year"].unique())
+scenarios = sorted(data["Scenario"].unique())
 
-# selected_year = st.sidebar.selectbox("Select Year", years)
-# selected_scenario = st.sidebar.selectbox("Select Scenario", scenarios)
+selected_year = st.sidebar.selectbox("Select Year", years)
+selected_scenario = st.sidebar.selectbox("Select Scenario", scenarios)
 
 # # Filter data based on selections
 # filtered_data = data[(data["Year"] == selected_year) & (data["Scenario"] == selected_scenario)]
