@@ -1,6 +1,5 @@
 streamlit
-xarray[complete]
+pandas
 geopandas
 folium
-numpy
-branca
+streamlit_folium
