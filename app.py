@@ -8,9 +8,9 @@ from streamlit_folium import folium_static
 GITHUB_CSV_URL = "https://raw.githubusercontent.com/manmeet3591/tc_texas/main/tc_mask_texas.csv"
 df = pd.read_csv(GITHUB_CSV_URL, parse_dates=['time'])
 
-# Load Texas counties shapefile (Upload a valid GeoJSON file in your repo)
-TEXAS_GEOJSON_URL = "https://raw.githubusercontent.com/manmeet3591/tc_texas/main/texas_counties.geojson"
-gdf = gpd.read_file(TEXAS_GEOJSON_URL)
+# Load the Texas counties GeoJSON file from your repository
+GEOJSON_PATH = "Texas_County_Boundaries_-2028607862104916578.geojson"  # Ensure this path matches the location in your repo
+gdf = gpd.read_file(GEOJSON_PATH)
 
 # Streamlit UI
 st.title("Texas TC Mask Visualization")
@@ -27,46 +27,46 @@ selected_scenario = st.sidebar.radio("Select Scenario", scenarios)
 # Filter data
 df_filtered = df[(df['time'].dt.year == selected_year) & (df['scenario'] == selected_scenario)]
 
-# Merge with GeoDataFrame (Ensure county identifiers match between files)
-merged = gdf.merge(df_filtered, how='left', left_on='county_column', right_on='lat_lon_column')
+# Ensure the 'county_column' in gdf matches with a column in df_filtered
+# You might need to perform spatial joins or have a common key for merging
+# For example, if both have a 'county_name' column:
+# merged = gdf.merge(df_filtered, how='left', left_on='county_name', right_on='county_name')
 
 # Create Folium map
 m = folium.Map(location=[31.9686, -99.9018], zoom_start=6)
 
+# Add Choropleth layer
 folium.Choropleth(
     geo_data=gdf,
     name="choropleth",
-    data=merged,
-    columns=["county_column", "tc_mask"],
-    key_on="feature.properties.county_column",
+    data=df_filtered,
+    columns=["county_name", "tc_mask"],  # Ensure these columns exist
+    key_on="feature.properties.county_name",  # Match this with the GeoJSON properties
     fill_color="YlOrRd",
     fill_opacity=0.7,
     line_opacity=0.2,
     legend_name="TC Mask Values"
 ).add_to(m)
 
-# Add hover feature
-def style_function(feature):
-    return {
+# Add hover functionality
+folium.GeoJson(
+    gdf,
+    style_function=lambda feature: {
         'fillColor': 'blue',
         'color': 'black',
         'weight': 1,
         'fillOpacity': 0.5
-    }
-
-def highlight_function(feature):
-    return {
+    },
+    highlight_function=lambda feature: {
         'fillColor': 'green',
         'color': 'yellow',
         'weight': 3,
         'fillOpacity': 0.7
-    }
-
-folium.GeoJson(
-    gdf,
-    style_function=style_function,
-    highlight_function=highlight_function,
-    tooltip=folium.GeoJsonTooltip(fields=["county_column", "tc_mask"], aliases=["County", "TC Mask Value"])
+    },
+    tooltip=folium.GeoJsonTooltip(
+        fields=["county_name"],  # Adjust based on your GeoJSON properties
+        aliases=["County: "]
+    )
 ).add_to(m)
 
 # Display map in Streamlit
