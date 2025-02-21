@@ -72,7 +72,7 @@ if ds:
                 (data["Longitude"] >= minx) & (data["Longitude"] <= maxx) &
                 (data["Latitude"] >= miny) & (data["Latitude"] <= maxy)
                     )
-    texas_counties.at[index, "TC_Mask_Sum"] = np.sum(np.array(data["TC_Mask"])[mask])
+            texas_counties.at[index, "TC_Mask_Sum"] = np.sum(np.array(data["TC_Mask"])[mask])
 
         # Create a map
         m = folium.Map(location=[31, -99], zoom_start=5)
