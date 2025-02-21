@@ -35,6 +35,9 @@ selected_county = st.sidebar.selectbox("Select County", counties)
 # Filter data based on selections
 filtered_data = data[(data["Year"] == selected_year) & (data["Scenario"] == selected_scenario) & (data["County"] == selected_county)]
 
+# Drop the first column before displaying
+filtered_data = filtered_data.iloc[:, 1:]
+
 # Display results
 st.write(f"### Number of Tropical Cyclones for {selected_county} in {selected_scenario} scenario in {selected_year}")
 st.dataframe(filtered_data.rename(columns={"TC": "Tropical Cyclones"}), hide_index=True)
