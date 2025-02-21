@@ -2,3 +2,4 @@ streamlit
 xarray
 matplotlib
 netCDF4
+plotly
