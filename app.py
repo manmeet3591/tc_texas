@@ -1,77 +1,40 @@
 import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import folium
-from streamlit_folium import folium_static
+import xarray as xr
+import matplotlib.pyplot as plt
+import os
 
-# Load the dataset from your GitHub repository
-GITHUB_CSV_URL = "https://raw.githubusercontent.com/manmeet3591/tc_texas/main/tc_mask_texas.csv"
-df = pd.read_csv(GITHUB_CSV_URL, parse_dates=['time'])
+# Streamlit App Title
+st.title("Texas Climate Data Viewer")
 
-# Load the Texas counties GeoJSON file from your repository
-GEOJSON_PATH = "Texas_County_Boundaries_-2028607862104916578.geojson"  # Ensure this path matches the location in your repo
-gdf = gpd.read_file(GEOJSON_PATH)
+# User selects scenario
+scenario = st.selectbox("Select Scenario:", ["historical", "ssp245", "ssp585"])
 
-# Streamlit UI
-st.title("Texas TC Mask Visualization")
-st.sidebar.header("Filters")
-
-# Year selection
-years = sorted(df['time'].dt.year.unique())
-selected_year = st.sidebar.selectbox("Select Year", years, index=len(years)-1)
-
-# Scenario selection
-scenarios = df['scenario'].unique().tolist()
-selected_scenario = st.sidebar.radio("Select Scenario", scenarios)
-
-# Filter data
-df_filtered = df[(df['time'].dt.year == selected_year) & (df['scenario'] == selected_scenario)]
-
-# Ensure the 'county_column' in gdf matches with a column in df_filtered
-if 'county_name' in gdf.columns and 'county_name' in df_filtered.columns:
-    merged = gdf.merge(df_filtered, how='left', left_on='county_name', right_on='county_name')
+# User selects year
+if scenario == "historical":
+    years = list(range(1979, 2015))  # Historical years
 else:
-    st.error("Column 'county_name' missing in either GeoJSON or dataset. Check column names.")
+    years = list(range(2015, 2101))  # Future projections
 
-# Create Folium map
-m = folium.Map(location=[31.9686, -99.9018], zoom_start=6)
+year = st.selectbox("Select Year:", years)
 
-# Add Choropleth layer
-if not df_filtered.empty:
-    folium.Choropleth(
-        geo_data=gdf,
-        name="choropleth",
-        data=df_filtered,
-        columns=["county_name", "tc_mask"],  # Ensure these columns exist
-        key_on="feature.properties.county_name",  # Match this with the GeoJSON properties
-        fill_color="YlOrRd",
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        legend_name="TC Mask Values"
-    ).add_to(m)
+# File path pattern
+file_path = f"data/tc_texas_{scenario}_{year}.nc"
+
+# Load and visualize data
+if os.path.exists(file_path):
+    with st.spinner("Loading data..."):
+        ds = xr.open_dataset(file_path)
+
+        # Assuming the dataset contains temperature or precipitation variables
+        variable = st.selectbox("Select Variable:", list(ds.data_vars.keys()))
+
+        data = ds[variable]
+
+        # Plot data
+        fig, ax = plt.subplots(figsize=(8, 6))
+        data.plot(ax=ax, cmap="gist_stern_r")
+        ax.set_title(f"{variable} - {scenario.upper()} {year}")
+
+        st.pyplot(fig)
 else:
-    st.warning("No data available for the selected year and scenario.")
-
-# Add hover functionality
-folium.GeoJson(
-    gdf,
-    style_function=lambda feature: {
-        'fillColor': 'blue',
-        'color': 'black',
-        'weight': 1,
-        'fillOpacity': 0.5
-    },
-    highlight_function=lambda feature: {
-        'fillColor': 'green',
-        'color': 'yellow',
-        'weight': 3,
-        'fillOpacity': 0.7
-    },
-    tooltip=folium.GeoJsonTooltip(
-        fields=["county_name"],  # Adjust based on your GeoJSON properties
-        aliases=["County: "]
-    )
-).add_to(m)
-
-# Display map in Streamlit
-folium_static(m)
+    st.error("File not found. Please select a different year or scenario.")
