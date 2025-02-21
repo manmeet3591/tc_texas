@@ -25,16 +25,22 @@ if os.path.exists(file_path):
     with st.spinner("Loading data..."):
         ds = xr.open_dataset(file_path)
 
-        # Assuming the dataset contains temperature or precipitation variables
-        variable = st.selectbox("Select Variable:", list(ds.data_vars.keys()))
+        if "tc_mask" in ds.data_vars:
+            tc_mask = ds["tc_mask"]
 
-        data = ds[variable]
+            # Compute the sum of tc_mask for the selected year
+            tc_mask_sum = tc_mask.sum().item()
 
-        # Plot data
-        fig, ax = plt.subplots(figsize=(8, 6))
-        data.plot(ax=ax, cmap="gist_stern_r")
-        ax.set_title(f"{variable} - {scenario.upper()} {year}")
+            # Display the sum
+            st.metric(label=f"Total tc_mask for {scenario.upper()} {year}", value=tc_mask_sum)
 
-        st.pyplot(fig)
+            # Plot tc_mask
+            fig, ax = plt.subplots(figsize=(8, 6))
+            tc_mask.plot(ax=ax, cmap="gist_stern_r")
+            ax.set_title(f"tc_mask - {scenario.upper()} {year}")
+
+            st.pyplot(fig)
+        else:
+            st.error("Variable 'tc_mask' not found in the dataset.")
 else:
     st.error("File not found. Please select a different year or scenario.")
