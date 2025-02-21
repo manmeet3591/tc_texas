@@ -29,8 +29,8 @@ scenarios = sorted(data["Scenario"].unique())
 selected_year = st.sidebar.selectbox("Select Year", years)
 selected_scenario = st.sidebar.selectbox("Select Scenario", scenarios)
 
-# # Filter data based on selections
-# filtered_data = data[(data["Year"] == selected_year) & (data["Scenario"] == selected_scenario)]
+# Filter data based on selections
+filtered_data = data[(data["Year"] == selected_year) & (data["Scenario"] == selected_scenario)]
 
 # # Display results
 # st.write(f"### Number of Tropical Cyclones for {selected_scenario} scenario in {selected_year}")
