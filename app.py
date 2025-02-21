@@ -16,22 +16,25 @@ data["TC"] = pd.to_numeric(data["TC"], errors='coerce')
 
 data.dropna(inplace=True)  # Remove invalid entries
 
-# Ensure Scenario column is string to avoid boolean-related errors
+# Ensure Scenario and County columns are string to avoid errors
 data["Scenario"] = data["Scenario"].astype(str)
+data["County"] = data["County"].astype(str)
 
 # Streamlit App Layout
-st.title("Texas Tropical Cyclones in the past and future scenarios")
+st.title("Texas Tropical Cyclones Data Viewer")
 
 # Sidebar Filters
 years = sorted(data["Year"].unique())
 scenarios = sorted(data["Scenario"].unique())
+counties = sorted(data["County"].unique())
 
 selected_year = st.sidebar.selectbox("Select Year", years)
 selected_scenario = st.sidebar.selectbox("Select Scenario", scenarios)
+selected_county = st.sidebar.selectbox("Select County", counties)
 
 # Filter data based on selections
-filtered_data = data[(data["Year"] == selected_year) & (data["Scenario"] == selected_scenario)]
+filtered_data = data[(data["Year"] == selected_year) & (data["Scenario"] == selected_scenario) & (data["County"] == selected_county)]
 
-# # Display results
-# st.write(f"### Number of Tropical Cyclones for {selected_scenario} scenario in {selected_year}")
-# st.dataframe(filtered_data.rename(columns={"TC": "Tropical Cyclones"}), hide_index=True)
+# Display results
+st.write(f"### Number of Tropical Cyclones for {selected_county} in {selected_scenario} scenario in {selected_year}")
+st.dataframe(filtered_data.rename(columns={"TC": "Tropical Cyclones"}), hide_index=True)
